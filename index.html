@@ -1,311 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>New Year 💖</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Login & Signup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
 
-body{
-  height:100vh;
-  background:radial-gradient(circle at top,#111 0%,#000 60%);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  color:#fff;
-  overflow:hidden;
-}
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-.container{z-index:2;text-align:center}
+    .container {
+      width: 350px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 30px;
+      color: #fff;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
 
-/* Countdown */
-.countdown{display:flex;gap:12px;justify-content:center}
-.box{
-  background:#1a1a1a;
-  padding:12px 16px;
-  border-radius:8px;
-}
-.num{font-size:26px;font-weight:700}
-.label{font-size:10px;opacity:.6}
+    .tabs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
 
-/* Book */
-.book{
-  width:min(90vw,380px);
-  height:min(75vh,460px);
-  background:#f6f1e7;
-  color:#222;
-  border-radius:14px;
-  padding:22px;
-  box-shadow:0 25px 45px rgba(0,0,0,.65);
-  transform:rotateX(90deg);
-  transform-origin:bottom;
-  display:none;
-  position:relative;
-}
+    .tabs label {
+      width: 50%;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      opacity: 0.6;
+      transition: 0.3s;
+    }
 
-.book.show{display:block;animation:openBook 1.4s ease forwards}
-@keyframes openBook{to{transform:rotateX(0)}}
+    input[type="radio"] {
+      display: none;
+    }
 
-.page{
-  height:100%;
-  overflow-y:auto;
-  font-family:'Courier New',monospace;
-  line-height:1.8;
-  white-space:pre-wrap;
-}
+    #login:checked ~ .tabs label[for="login"],
+    #signup:checked ~ .tabs label[for="signup"] {
+      opacity: 1;
+      border-bottom: 2px solid #fff;
+    }
 
-.cursor{
-  width:2px;height:18px;background:#000;
-  display:inline-block;
-  animation:blink 1s infinite;
-}
-@keyframes blink{50%{opacity:0}}
+    .form {
+      display: none;
+      margin-top: 20px;
+    }
 
-.hint{font-size:12px;opacity:.5;margin-top:10px}
+    #login:checked ~ .login-form,
+    #signup:checked ~ .signup-form {
+      display: block;
+    }
 
-/* Accept Button */
-.accept-btn{
-  margin-top:25px;
-  padding:14px 36px;
-  font-size:17px;
-  border:none;
-  border-radius:30px;
-  color:#fff;
-  background:linear-gradient(45deg,#ff4d6d,#ff85a1);
-  cursor:pointer;
-  box-shadow:0 0 18px #ff4d6d;
-  animation:glow 1.6s infinite alternate;
-}
-@keyframes glow{
-  from{box-shadow:0 0 15px #ff4d6d}
-  to{box-shadow:0 0 32px #ff85a1}
-}
+    .form input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+    }
 
-/* WhatsApp Button */
-.whatsapp-btn{
-  display:inline-block;
-  margin-top:12px;
-  padding:10px 22px;
-  background:#25D366;
-  color:#fff;
-  border-radius:20px;
-  text-decoration:none;
-  font-size:14px;
-}
+    .form button {
+      width: 100%;
+      padding: 12px;
+      background: #fff;
+      color: #2575fc;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-/* Sparkles */
-.sparkle{
-  position:absolute;
-  width:6px;height:6px;
-  background:#fff;
-  border-radius:50%;
-  animation:sparkle 1s ease-out forwards;
-}
-@keyframes sparkle{
-  to{transform:translate(var(--x),var(--y)) scale(0);opacity:0}
-}
+    .form button:hover {
+      background: #eaeaea;
+    }
 
-/* Hearts */
-.heart{
-  position:absolute;
-  font-size:18px;
-  animation:heart 1.2s ease-out forwards;
-}
-@keyframes heart{
-  to{transform:translate(var(--x),var(--y)) scale(0);opacity:0}
-}
-</style>
+    .form p {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 10px;
+      opacity: 0.8;
+    }
+  </style>
 </head>
-
 <body>
-<div class="container" id="capture">
 
-  <!-- COUNTDOWN -->
-  <div class="countdown" id="countdown">
-    <div class="box"><div class="num" id="d">00</div><div class="label">DAYS</div></div>
-    <div class="box"><div class="num" id="h">00</div><div class="label">HRS</div></div>
-    <div class="box"><div class="num" id="m">00</div><div class="label">MIN</div></div>
-    <div class="box"><div class="num" id="s">00</div><div class="label">SEC</div></div>
+  <div class="container">
+
+    <input type="radio" name="tab" id="login" checked>
+    <input type="radio" name="tab" id="signup">
+
+    <div class="tabs">
+      <label for="login">Login</label>
+      <label for="signup">Signup</label>
+    </div>
+
+    <!-- Login Form -->
+    <div class="form login-form">
+      <input type="email" placeholder="Email" required>
+      <input type="password" placeholder="Password" required>
+      <button>Login</button>
+      <p>Welcome back 👋</p>
+    </div>
+
+    <!-- Signup Form -->
+    <div class="form signup-form">
+      <input type="text" placeholder="Full Name" required>
+      <input type="email" placeholder="Email" required>
+      <input type="password" placeholder="Password" required>
+      <button>Create Account</button>
+      <p>Join us today 🚀</p>
+    </div>
+
   </div>
 
-  <!-- BOOK -->
-  <div class="book" id="book">
-    <div class="page" id="page"></div>
-    <div class="hint">ᴄʟɪᴄᴋ ᴛᴏ ᴛᴜʀɴ ᴘᴀɢᴇ 📖</div>
-  </div>
-
-</div>
-
-<script>
-/* ===== TARGET DATE : NEW YEAR ===== */
-// 1 January 2026, 12:00:00 AM
-const targetDate = new Date(
-  2026, // year
-  0,    // month (January = 0)
-  1,    // day
-  0,    // hour (12 AM)
-  0,    // minute
-  0     // second
-).getTime();
-
-
-
-
-const dEl=document.getElementById("d");
-const hEl=document.getElementById("h");
-const mEl=document.getElementById("m");
-const sEl=document.getElementById("s");
-const book=document.getElementById("book");
-
-const timer=setInterval(()=>{
-  const now=Date.now();
-  const diff=targetDate-now;
-
-  if(diff<=0){
-    clearInterval(timer);
-    document.getElementById("countdown").style.display="none";
-    book.classList.add("show");
-    sparkles();
-    typeText();
-    return;
-  }
-
-  const d=Math.floor(diff/(1000*60*60*24));
-  const h=Math.floor((diff/(1000*60*60))%24);
-  const m=Math.floor((diff/(1000*60))%60);
-  const s=Math.floor((diff/1000)%60);
-
-  dEl.textContent=String(d).padStart(2,'0');
-  hEl.textContent=String(h).padStart(2,'0');
-  mEl.textContent=String(m).padStart(2,'0');
-  sEl.textContent=String(s).padStart(2,'0');
-},1000);
-
-/* ===== PAGES ===== */
-const pages=[
-`✨ Happy New Year ✨
-
-May this year bring peace to your heart,
-strength to your soul,
-and endless reasons to smile 🤍
-
-I hope this new beginning fills your life
-with love, warmth, and beautiful moments 🌸`,
-
-`As this New Year arrives, I find myself thinking about you more than anything else 🫠🤍
-
-Some people come into our lives and slowly become a habit,
-but you became a part of me 🥹🥹
-
-Through every phase, every silence — you stayed.
-And maybe I never say this enough,
-but your presence has mattered more to me
-than you’ll ever know 🫂🤍🧿
-
-I am extremely sorry for my words,
-my actions, and the things that hurt you ❤️‍🩹
-
-Maybe you have found a better friend,
-someone who treats you better than me —
-and you truly deserve that.
-Still , I am genuinely happy for you 🫠
-
-But please never think that I’ve changed for you.
-I never will 🧿🧿
-
-Your silence literally fades me,
-so please never do that 🙏🙏
-
-You seriously mean a lot to me 🥺🥺
-
-As we close the last chapter of this year,
-I’m grateful that your name appears
-in so many pages of mine 🫂💌👀
-
-All I can say, in my poetic words, is this —
-You are my “Ruh-al-Ruh” 🤌🫂🧿`,
-
-`<h1>
-Can we always be this close???<br>
-Forever and ever 🫠🫠
-</h1>
-
-<button class="accept-btn" onclick="acceptLove()">Accepting 💖</button><br>
-<a class="whatsapp-btn" target="_blank"
-href="https://wa.me/?text=I%20accepted%20this%20beautiful%20New%20Year%20letter%20💖">
-Share on WhatsApp
-</a>`
-];
-
-let pageIndex=0,charIndex=0;
-
-/* TYPEWRITER */
-function typeText(){
-  const page=document.getElementById("page");
-  const text=pages[pageIndex];
-  if(charIndex<=text.length){
-    page.innerHTML=text.slice(0,charIndex++)+'<span class="cursor"></span>';
-    setTimeout(typeText,30);
-  }
-}
-
-/* PAGE TURN */
-book.addEventListener("click",()=>{
-  if(pageIndex<pages.length-1){
-    pageIndex++;charIndex=0;
-    page.innerHTML="";
-    typeText();
-  }
-});
-
-/* SPARKLES */
-function sparkles(){
-  for(let i=0;i<30;i++){
-    const s=document.createElement("div");
-    s.className="sparkle";
-    s.style.left="50%";
-    s.style.top="50%";
-    s.style.setProperty("--x",(Math.random()*300-150)+"px");
-    s.style.setProperty("--y",(Math.random()*300-150)+"px");
-    book.appendChild(s);
-    setTimeout(()=>s.remove(),1000);
-  }
-}
-
-/* ACCEPT */
-function acceptLove(){
-  if(navigator.vibrate) navigator.vibrate([200,100,200]);
-
-  for(let i=0;i<25;i++){
-    const h=document.createElement("div");
-    h.className="heart";
-    h.innerHTML="💖";
-    h.style.left=Math.random()*innerWidth+"px";
-    h.style.top=Math.random()*innerHeight/2+"px";
-    h.style.setProperty("--x",(Math.random()*200-100)+"px");
-    h.style.setProperty("--y",(Math.random()*-200-100)+"px");
-    document.body.appendChild(h);
-    setTimeout(()=>h.remove(),1200);
-  }
-
-  setTimeout(saveShot,600);
-}
-
-/* SCREENSHOT */
-function saveShot(){
-  html2canvas(document.getElementById("capture")).then(c=>{
-    const a=document.createElement("a");
-    a.download="new_year_2025.png";
-    a.href=c.toDataURL();
-    a.click();
-  });
-}
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </body>
 </html>
