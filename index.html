@@ -1,199 +1,231 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
 <meta charset="UTF-8">
 <title>Naam Jap Counter</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+:root {
+  --bg: linear-gradient(135deg,#ffdd55,#ffd000);
+  --card: rgba(255,255,255,0.35);
+  --text: #000;
+  --accent: #000;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: #ffd84d;
+  background: var(--bg);
+  color: var(--text);
   text-align: center;
+  min-height: 100vh;
 }
 
 header {
-  background: #f5c400;
   padding: 15px;
   font-size: 22px;
   font-weight: bold;
 }
 
 button {
-  padding: 12px 18px;
-  margin: 10px;
+  padding: 10px 16px;
+  margin: 6px;
   border: none;
   border-radius: 10px;
-  background: #000;
+  background: var(--accent);
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
 }
 
-.hidden { display: none; }
+.card {
+  backdrop-filter: blur(10px);
+  background: var(--card);
+  margin: 15px;
+  padding: 15px;
+  border-radius: 16px;
+}
+
+.hidden { display:none; }
 
 .circle {
   width: 220px;
   height: 220px;
   border-radius: 50%;
-  border: 12px solid rgba(0,0,0,0.2);
-  margin: 40px auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 42px;
-  font-weight: bold;
-  position: relative;
-  cursor: pointer;
+  border: 14px solid rgba(0,0,0,0.2);
+  margin: 25px auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  font-weight:bold;
+  position:relative;
 }
 
 .circle::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 12px solid #000;
-  transform: rotate(-90deg);
-  stroke-dasharray: 690;
-  stroke-dashoffset: var(--fill, 690);
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  border:14px solid var(--accent);
+  transform:rotate(-90deg);
+  stroke-dasharray:690;
+  stroke-dashoffset:var(--fill,690);
 }
 
-.stats {
-  font-size: 16px;
-  margin: 8px;
+.top-actions button {
+  font-size:12px;
+  padding:8px 10px;
 }
 
-.card {
-  background: #fff3c4;
-  margin: 20px;
-  padding: 15px;
-  border-radius: 12px;
+input {
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  width:70%;
+  margin:10px 0;
 }
 </style>
 </head>
 
 <body>
 
-<header id="title">RADHARAMAN</header>
+<header id="appTitle">RADHARAMAN</header>
+
+<!-- LOGIN -->
+<div id="login" class="card">
+  <h2>नाम जप लॉगिन</h2>
+  <input id="username" placeholder="Enter your name">
+  <br>
+  <button onclick="login()">Start Jap</button>
+</div>
 
 <!-- HOME -->
-<div id="home">
-  <h2>Select Jap Counter</h2>
-  <button onclick="openCounter('radha')">Radha</button>
-  <button onclick="openCounter('mahadev')">Mahadev</button>
-  <button onclick="openCounter('ram')">Ram</button>
+<div id="home" class="hidden card">
+  <div class="top-actions">
+    <button onclick="toggleLang()">🌐 भाषा</button>
+    <button onclick="changeTheme()">🎨 Theme</button>
+  </div>
+
+  <h2 id="selectText">जप काउंटर चुनें</h2>
+  <button onclick="openCounter('radha')">राधा</button>
+  <button onclick="openCounter('mahadev')">महादेव</button>
+  <button onclick="openCounter('ram')">राम</button>
 </div>
 
 <!-- COUNTER -->
 <div id="counter" class="hidden">
 
   <button onclick="goHome()">⬅ Back</button>
-
   <h1 id="godName"></h1>
 
   <div class="circle" onclick="tap()" id="circle">
     <span id="count">0</span>
   </div>
 
-  <div class="stats" id="today"></div>
-  <div class="stats" id="week"></div>
-  <div class="stats" id="month"></div>
+  <div class="card" id="stats"></div>
 
   <div class="card">
-    <strong>Most Active Time</strong>
+    <strong id="activeLabel">Most Active Time</strong>
     <div id="activeTime"></div>
   </div>
 
 </div>
 
-<script>
-let currentGod = "";
+<audio id="tapSound">
+  <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=">
+</audio>
 
-function openCounter(god) {
-  currentGod = god;
-  document.getElementById("home").classList.add("hidden");
-  document.getElementById("counter").classList.remove("hidden");
-  document.getElementById("godName").innerText = god.toUpperCase();
-  loadData();
+<script>
+let user="", god="", lang="hi";
+let themes=[
+  ["linear-gradient(135deg,#ffdd55,#ffd000)","#000"],
+  ["linear-gradient(135deg,#111,#333)","#fff"],
+  ["linear-gradient(135deg,#3db2ff,#6ee7ff)","#003"],
+  ["linear-gradient(135deg,#ffb6c1,#ff6f91)","#400"]
+];
+let themeIndex=0;
+
+function login(){
+  user=document.getElementById("username").value.trim();
+  if(!user) return alert("Enter name");
+  localStorage.setItem("nj_user",user);
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
 }
 
-function goHome() {
+window.onload=()=>{
+  let u=localStorage.getItem("nj_user");
+  if(u){ user=u; document.getElementById("login").classList.add("hidden"); document.getElementById("home").classList.remove("hidden"); }
+};
+
+function key(k){ return user+"_"+god+"_"+k; }
+
+function openCounter(g){
+  god=g;
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("counter").classList.remove("hidden");
+  document.getElementById("godName").innerText=g.toUpperCase();
+  update();
+}
+
+function goHome(){
   document.getElementById("counter").classList.add("hidden");
   document.getElementById("home").classList.remove("hidden");
 }
 
-function getKey(key) {
-  return `${currentGod}_${key}`;
+function tap(){
+  let t=+localStorage.getItem(key("total"))||0;
+  t++; localStorage.setItem(key("total"),t);
+
+  let d=new Date().toDateString();
+  let td=JSON.parse(localStorage.getItem(key("day"))||"{}");
+  td[d]=(td[d]||0)+1;
+  localStorage.setItem(key("day"),JSON.stringify(td));
+
+  let h=new Date().getHours();
+  let hd=JSON.parse(localStorage.getItem(key("hour"))||"{}");
+  hd[h]=(hd[h]||0)+1;
+  localStorage.setItem(key("hour"),JSON.stringify(hd));
+
+  navigator.vibrate?.(20);
+  document.getElementById("tapSound").play();
+  update();
 }
 
-function tap() {
-  let total = parseInt(localStorage.getItem(getKey("total")) || 0);
-  total++;
-  localStorage.setItem(getKey("total"), total);
+function update(){
+  let t=+localStorage.getItem(key("total"))||0;
+  document.getElementById("count").innerText=t;
 
-  let todayKey = new Date().toDateString();
-  let today = JSON.parse(localStorage.getItem(getKey("today")) || "{}");
-  today[todayKey] = (today[todayKey] || 0) + 1;
-  localStorage.setItem(getKey("today"), JSON.stringify(today));
+  let day=JSON.parse(localStorage.getItem(key("day"))||"{}");
+  let today=day[new Date().toDateString()]||0;
 
-  let hour = new Date().getHours();
-  let hours = JSON.parse(localStorage.getItem(getKey("hours")) || "{}");
-  hours[hour] = (hours[hour] || 0) + 1;
-  localStorage.setItem(getKey("hours"), JSON.stringify(hours));
+  document.getElementById("stats").innerHTML=
+    (lang==="hi"?"आज: ":"Today: ")+today+"<br>"+
+    (lang==="hi"?"कुल: ":"Total: ")+t;
 
-  updateUI();
+  let hd=JSON.parse(localStorage.getItem(key("hour"))||"{}");
+  let mh="N/A",mx=0;
+  for(let k in hd){ if(hd[k]>mx){mx=hd[k];mh=k+":00";}}
+  document.getElementById("activeTime").innerText=mh;
+
+  let fill=690-(t%108)/108*690;
+  document.getElementById("circle").style.setProperty("--fill",fill);
 }
 
-function loadData() {
-  updateUI();
+function toggleLang(){
+  lang=lang==="hi"?"sa":"hi";
+  document.getElementById("selectText").innerText=
+    lang==="hi"?"जप काउंटर चुनें":"जप गणकः";
+  document.getElementById("activeLabel").innerText=
+    lang==="hi"?"सक्रिय समय":"सक्रिय कालः";
 }
 
-function updateUI() {
-  let total = localStorage.getItem(getKey("total")) || 0;
-  document.getElementById("count").innerText = total;
-
-  let todayData = JSON.parse(localStorage.getItem(getKey("today")) || "{}");
-  let todayKey = new Date().toDateString();
-  document.getElementById("today").innerText =
-    "Today's Taps: " + (todayData[todayKey] || 0);
-
-  let weekTotal = 0;
-  let now = new Date();
-  for (let k in todayData) {
-    let d = new Date(k);
-    if ((now - d) / (1000 * 60 * 60 * 24) <= 7) {
-      weekTotal += todayData[k];
-    }
-  }
-
-  document.getElementById("week").innerText =
-    "This Week: " + weekTotal;
-
-  let monthTotal = 0;
-  for (let k in todayData) {
-    let d = new Date(k);
-    if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
-      monthTotal += todayData[k];
-    }
-  }
-
-  document.getElementById("month").innerText =
-    "This Month: " + monthTotal;
-
-  let hours = JSON.parse(localStorage.getItem(getKey("hours")) || "{}");
-  let maxHour = "N/A", max = 0;
-  for (let h in hours) {
-    if (hours[h] > max) {
-      max = hours[h];
-      maxHour = h + ":00 - " + (parseInt(h)+1) + ":00";
-    }
-  }
-
-  document.getElementById("activeTime").innerText = maxHour;
-
-  let fill = 690 - (total % 108) / 108 * 690;
-  document.getElementById("circle").style.setProperty("--fill", fill);
+function changeTheme(){
+  themeIndex=(themeIndex+1)%themes.length;
+  document.body.style.background=themes[themeIndex][0];
+  document.documentElement.style.setProperty("--accent",themes[themeIndex][1]);
 }
 </script>
 
