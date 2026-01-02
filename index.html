@@ -1,60 +1,59 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Naam Jap Counter</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root {
-  --bg: linear-gradient(135deg,#ffdd55,#ffd000);
-  --card: rgba(255,255,255,0.35);
-  --text: #000;
-  --accent: #000;
+:root{
+  --bg:linear-gradient(135deg,#ffd54f,#ffb300);
+  --card:rgba(255,255,255,0.25);
+  --text:#000;
+  --accent:#000;
 }
 
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  text-align: center;
-  min-height: 100vh;
+body{
+  margin:0;
+  font-family:Segoe UI, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  text-align:center;
+  min-height:100vh;
 }
 
-header {
-  padding: 15px;
-  font-size: 22px;
-  font-weight: bold;
+header{
+  padding:14px;
+  font-size:22px;
+  font-weight:bold;
 }
 
-button {
-  padding: 10px 16px;
-  margin: 6px;
-  border: none;
-  border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
+button{
+  padding:10px 16px;
+  border:none;
+  border-radius:12px;
+  background:var(--accent);
+  color:#fff;
+  margin:6px;
+  cursor:pointer;
 }
 
-.card {
-  backdrop-filter: blur(10px);
-  background: var(--card);
-  margin: 15px;
-  padding: 15px;
-  border-radius: 16px;
+.card{
+  backdrop-filter:blur(12px);
+  background:var(--card);
+  border-radius:18px;
+  margin:15px;
+  padding:15px;
 }
 
-.hidden { display:none; }
+.hidden{display:none;}
 
-.circle {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  border: 14px solid rgba(0,0,0,0.2);
-  margin: 25px auto;
+.circle{
+  width:240px;
+  height:240px;
+  border-radius:50%;
+  border:14px solid rgba(0,0,0,.2);
+  margin:25px auto;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -63,7 +62,7 @@ button {
   position:relative;
 }
 
-.circle::after {
+.circle::after{
   content:"";
   position:absolute;
   inset:0;
@@ -72,125 +71,105 @@ button {
   transform:rotate(-90deg);
   stroke-dasharray:690;
   stroke-dashoffset:var(--fill,690);
+  transition:.3s;
 }
 
-.top-actions button {
-  font-size:12px;
-  padding:8px 10px;
+.meditation{
+  animation:breath 6s infinite alternate;
 }
 
-input {
-  padding:10px;
-  border-radius:10px;
-  border:none;
-  width:70%;
-  margin:10px 0;
+@keyframes breath{
+  from{transform:scale(1);}
+  to{transform:scale(1.05);}
 }
 </style>
 </head>
 
 <body>
 
-<header id="appTitle">RADHARAMAN</header>
-
-<!-- LOGIN -->
-<div id="login" class="card">
-  <h2>नाम जप लॉगिन</h2>
-  <input id="username" placeholder="Enter your name">
-  <br>
-  <button onclick="login()">Start Jap</button>
-</div>
+<header id="title">RADHARAMAN</header>
 
 <!-- HOME -->
-<div id="home" class="hidden card">
-  <div class="top-actions">
-    <button onclick="toggleLang()">🌐 भाषा</button>
-    <button onclick="changeTheme()">🎨 Theme</button>
+<div id="home" class="card">
+  <div>
+    <button onclick="changeLang()">🌐</button>
+    <button onclick="changeTheme()">🎨</button>
+    <button onclick="toggleMeditation()">🧘</button>
   </div>
 
-  <h2 id="selectText">जप काउंटर चुनें</h2>
-  <button onclick="openCounter('radha')">राधा</button>
-  <button onclick="openCounter('mahadev')">महादेव</button>
-  <button onclick="openCounter('ram')">राम</button>
+  <h3 id="selectText">Select Jap Counter</h3>
+  <button onclick="openCounter('radha')">Radha</button>
+  <button onclick="openCounter('mahadev')">Mahadev</button>
+  <button onclick="openCounter('ram')">Ram</button>
+
+  <div class="card">
+    🔥 <span id="streak">0</span> Day Streak
+  </div>
 </div>
 
 <!-- COUNTER -->
 <div id="counter" class="hidden">
+  <button onclick="back()">⬅ Back</button>
+  <h2 id="god"></h2>
 
-  <button onclick="goHome()">⬅ Back</button>
-  <h1 id="godName"></h1>
-
-  <div class="circle" onclick="tap()" id="circle">
+  <div class="circle" id="circle" onclick="tap()">
     <span id="count">0</span>
   </div>
 
   <div class="card" id="stats"></div>
-
-  <div class="card">
-    <strong id="activeLabel">Most Active Time</strong>
-    <div id="activeTime"></div>
-  </div>
-
 </div>
 
-<audio id="tapSound">
-  <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=">
+<audio id="bell">
+<source src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=">
 </audio>
 
 <script>
-let user="", god="", lang="hi";
-let themes=[
-  ["linear-gradient(135deg,#ffdd55,#ffd000)","#000"],
-  ["linear-gradient(135deg,#111,#333)","#fff"],
-  ["linear-gradient(135deg,#3db2ff,#6ee7ff)","#003"],
-  ["linear-gradient(135deg,#ffb6c1,#ff6f91)","#400"]
+let god="",lang=0,theme=0,meditation=false;
+const langs=[
+  {sel:"Select Jap Counter",today:"Today",total:"Total"},
+  {sel:"जप चुनें",today:"आज",total:"कुल"},
+  {sel:"जप गणकः",today:"अद्य",total:"समस्त"}
 ];
-let themeIndex=0;
 
-function login(){
-  user=document.getElementById("username").value.trim();
-  if(!user) return alert("Enter name");
-  localStorage.setItem("nj_user",user);
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("home").classList.remove("hidden");
-}
+const themes=[
+ ["linear-gradient(135deg,#ffd54f,#ffb300)","#000"],
+ ["linear-gradient(135deg,#111,#333)","#fff"],
+ ["linear-gradient(135deg,#4facfe,#00f2fe)","#003"],
+ ["linear-gradient(135deg,#ff9a9e,#fad0c4)","#400"],
+ ["linear-gradient(135deg,#56ab2f,#a8e063)","#020"],
+ ["linear-gradient(135deg,#141e30,#243b55)","#fff"]
+];
 
-window.onload=()=>{
-  let u=localStorage.getItem("nj_user");
-  if(u){ user=u; document.getElementById("login").classList.add("hidden"); document.getElementById("home").classList.remove("hidden"); }
-};
-
-function key(k){ return user+"_"+god+"_"+k; }
+function key(k){return god+"_"+k;}
 
 function openCounter(g){
   god=g;
   document.getElementById("home").classList.add("hidden");
   document.getElementById("counter").classList.remove("hidden");
-  document.getElementById("godName").innerText=g.toUpperCase();
+  document.getElementById("god").innerText=g.toUpperCase();
   update();
 }
 
-function goHome(){
+function back(){
   document.getElementById("counter").classList.add("hidden");
   document.getElementById("home").classList.remove("hidden");
 }
 
 function tap(){
   let t=+localStorage.getItem(key("total"))||0;
-  t++; localStorage.setItem(key("total"),t);
+  t++;
+  localStorage.setItem(key("total"),t);
 
   let d=new Date().toDateString();
-  let td=JSON.parse(localStorage.getItem(key("day"))||"{}");
-  td[d]=(td[d]||0)+1;
-  localStorage.setItem(key("day"),JSON.stringify(td));
+  let day=JSON.parse(localStorage.getItem(key("day"))||"{}");
+  day[d]=(day[d]||0)+1;
+  localStorage.setItem(key("day"),JSON.stringify(day));
 
-  let h=new Date().getHours();
-  let hd=JSON.parse(localStorage.getItem(key("hour"))||"{}");
-  hd[h]=(hd[h]||0)+1;
-  localStorage.setItem(key("hour"),JSON.stringify(hd));
+  if(t%108===0){
+    navigator.vibrate?.(200);
+    document.getElementById("bell").play();
+  }
 
-  navigator.vibrate?.(20);
-  document.getElementById("tapSound").play();
   update();
 }
 
@@ -202,30 +181,26 @@ function update(){
   let today=day[new Date().toDateString()]||0;
 
   document.getElementById("stats").innerHTML=
-    (lang==="hi"?"आज: ":"Today: ")+today+"<br>"+
-    (lang==="hi"?"कुल: ":"Total: ")+t;
-
-  let hd=JSON.parse(localStorage.getItem(key("hour"))||"{}");
-  let mh="N/A",mx=0;
-  for(let k in hd){ if(hd[k]>mx){mx=hd[k];mh=k+":00";}}
-  document.getElementById("activeTime").innerText=mh;
+    `${langs[lang].today}: ${today}<br>${langs[lang].total}: ${t}`;
 
   let fill=690-(t%108)/108*690;
   document.getElementById("circle").style.setProperty("--fill",fill);
 }
 
-function toggleLang(){
-  lang=lang==="hi"?"sa":"hi";
-  document.getElementById("selectText").innerText=
-    lang==="hi"?"जप काउंटर चुनें":"जप गणकः";
-  document.getElementById("activeLabel").innerText=
-    lang==="hi"?"सक्रिय समय":"सक्रिय कालः";
+function changeLang(){
+  lang=(lang+1)%3;
+  document.getElementById("selectText").innerText=langs[lang].sel;
 }
 
 function changeTheme(){
-  themeIndex=(themeIndex+1)%themes.length;
-  document.body.style.background=themes[themeIndex][0];
-  document.documentElement.style.setProperty("--accent",themes[themeIndex][1]);
+  theme=(theme+1)%themes.length;
+  document.body.style.background=themes[theme][0];
+  document.documentElement.style.setProperty("--accent",themes[theme][1]);
+}
+
+function toggleMeditation(){
+  meditation=!meditation;
+  document.getElementById("circle").classList.toggle("meditation",meditation);
 }
 </script>
 
