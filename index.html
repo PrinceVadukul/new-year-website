@@ -1,137 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Login & Signup</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Naam Jap Counter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #ffd84d;
+  text-align: center;
+}
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
+header {
+  background: #f5c400;
+  padding: 15px;
+  font-size: 22px;
+  font-weight: bold;
+}
 
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+button {
+  padding: 12px 18px;
+  margin: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #000;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    .container {
-      width: 350px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 30px;
-      color: #fff;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    }
+.hidden { display: none; }
 
-    .tabs {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
+.circle {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 12px solid rgba(0,0,0,0.2);
+  margin: 40px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: bold;
+  position: relative;
+  cursor: pointer;
+}
 
-    .tabs label {
-      width: 50%;
-      text-align: center;
-      padding: 10px;
-      cursor: pointer;
-      font-weight: 500;
-      opacity: 0.6;
-      transition: 0.3s;
-    }
+.circle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 12px solid #000;
+  transform: rotate(-90deg);
+  stroke-dasharray: 690;
+  stroke-dashoffset: var(--fill, 690);
+}
 
-    input[type="radio"] {
-      display: none;
-    }
+.stats {
+  font-size: 16px;
+  margin: 8px;
+}
 
-    #login:checked ~ .tabs label[for="login"],
-    #signup:checked ~ .tabs label[for="signup"] {
-      opacity: 1;
-      border-bottom: 2px solid #fff;
-    }
-
-    .form {
-      display: none;
-      margin-top: 20px;
-    }
-
-    #login:checked ~ .login-form,
-    #signup:checked ~ .signup-form {
-      display: block;
-    }
-
-    .form input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: none;
-      border-radius: 8px;
-      outline: none;
-    }
-
-    .form button {
-      width: 100%;
-      padding: 12px;
-      background: #fff;
-      color: #2575fc;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .form button:hover {
-      background: #eaeaea;
-    }
-
-    .form p {
-      text-align: center;
-      font-size: 14px;
-      margin-top: 10px;
-      opacity: 0.8;
-    }
-  </style>
+.card {
+  background: #fff3c4;
+  margin: 20px;
+  padding: 15px;
+  border-radius: 12px;
+}
+</style>
 </head>
+
 <body>
 
-  <div class="container">
+<header id="title">RADHARAMAN</header>
 
-    <input type="radio" name="tab" id="login" checked>
-    <input type="radio" name="tab" id="signup">
+<!-- HOME -->
+<div id="home">
+  <h2>Select Jap Counter</h2>
+  <button onclick="openCounter('radha')">Radha</button>
+  <button onclick="openCounter('mahadev')">Mahadev</button>
+  <button onclick="openCounter('ram')">Ram</button>
+</div>
 
-    <div class="tabs">
-      <label for="login">Login</label>
-      <label for="signup">Signup</label>
-    </div>
+<!-- COUNTER -->
+<div id="counter" class="hidden">
 
-    <!-- Login Form -->
-    <div class="form login-form">
-      <input type="email" placeholder="Email" required>
-      <input type="password" placeholder="Password" required>
-      <button>Login</button>
-      <p>Welcome back 👋</p>
-    </div>
+  <button onclick="goHome()">⬅ Back</button>
 
-    <!-- Signup Form -->
-    <div class="form signup-form">
-      <input type="text" placeholder="Full Name" required>
-      <input type="email" placeholder="Email" required>
-      <input type="password" placeholder="Password" required>
-      <button>Create Account</button>
-      <p>Join us today 🚀</p>
-    </div>
+  <h1 id="godName"></h1>
 
+  <div class="circle" onclick="tap()" id="circle">
+    <span id="count">0</span>
   </div>
+
+  <div class="stats" id="today"></div>
+  <div class="stats" id="week"></div>
+  <div class="stats" id="month"></div>
+
+  <div class="card">
+    <strong>Most Active Time</strong>
+    <div id="activeTime"></div>
+  </div>
+
+</div>
+
+<script>
+let currentGod = "";
+
+function openCounter(god) {
+  currentGod = god;
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("counter").classList.remove("hidden");
+  document.getElementById("godName").innerText = god.toUpperCase();
+  loadData();
+}
+
+function goHome() {
+  document.getElementById("counter").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+
+function getKey(key) {
+  return `${currentGod}_${key}`;
+}
+
+function tap() {
+  let total = parseInt(localStorage.getItem(getKey("total")) || 0);
+  total++;
+  localStorage.setItem(getKey("total"), total);
+
+  let todayKey = new Date().toDateString();
+  let today = JSON.parse(localStorage.getItem(getKey("today")) || "{}");
+  today[todayKey] = (today[todayKey] || 0) + 1;
+  localStorage.setItem(getKey("today"), JSON.stringify(today));
+
+  let hour = new Date().getHours();
+  let hours = JSON.parse(localStorage.getItem(getKey("hours")) || "{}");
+  hours[hour] = (hours[hour] || 0) + 1;
+  localStorage.setItem(getKey("hours"), JSON.stringify(hours));
+
+  updateUI();
+}
+
+function loadData() {
+  updateUI();
+}
+
+function updateUI() {
+  let total = localStorage.getItem(getKey("total")) || 0;
+  document.getElementById("count").innerText = total;
+
+  let todayData = JSON.parse(localStorage.getItem(getKey("today")) || "{}");
+  let todayKey = new Date().toDateString();
+  document.getElementById("today").innerText =
+    "Today's Taps: " + (todayData[todayKey] || 0);
+
+  let weekTotal = 0;
+  let now = new Date();
+  for (let k in todayData) {
+    let d = new Date(k);
+    if ((now - d) / (1000 * 60 * 60 * 24) <= 7) {
+      weekTotal += todayData[k];
+    }
+  }
+
+  document.getElementById("week").innerText =
+    "This Week: " + weekTotal;
+
+  let monthTotal = 0;
+  for (let k in todayData) {
+    let d = new Date(k);
+    if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+      monthTotal += todayData[k];
+    }
+  }
+
+  document.getElementById("month").innerText =
+    "This Month: " + monthTotal;
+
+  let hours = JSON.parse(localStorage.getItem(getKey("hours")) || "{}");
+  let maxHour = "N/A", max = 0;
+  for (let h in hours) {
+    if (hours[h] > max) {
+      max = hours[h];
+      maxHour = h + ":00 - " + (parseInt(h)+1) + ":00";
+    }
+  }
+
+  document.getElementById("activeTime").innerText = maxHour;
+
+  let fill = 690 - (total % 108) / 108 * 690;
+  document.getElementById("circle").style.setProperty("--fill", fill);
+}
+</script>
 
 </body>
 </html>
